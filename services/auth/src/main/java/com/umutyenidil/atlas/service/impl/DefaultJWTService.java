@@ -3,7 +3,9 @@ package com.umutyenidil.atlas.service.impl;
 import com.umutyenidil.atlas.entity.Auth;
 import com.umutyenidil.atlas.service.JWTService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.security.SignatureException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,9 +71,13 @@ public class DefaultJWTService implements JWTService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = extractEmail(token);
+        try {
+            final String email = extractEmail(token);
 
-        return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
+            return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        } catch (ExpiredJwtException | MalformedJwtException e) {
+            return false;
+        }
     }
 
     public String extractEmail(String token) {

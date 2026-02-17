@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record RegisterRequestDTO(
-        @NotBlank(message = "E-posta alanı boş bırakılamaz")
-        @Email(message = "Geçerli bir e-posta adresi giriniz")
+        @NotBlank(message = "{validation.auth.email.notblank}")
+        @Email(message = "{validation.auth.email.invalid}")
         String email,
 
-        @NotBlank(message = "Şifre alanı boş bırakılamaz")
-        @Size(min = 8, message = "Şifre en az 8 karakter olmalıdır")
+        @NotBlank(message = "{validation.auth.password.notblank}")
+        @Size(min = 8, message = "{validation.auth.password.size}")
         String password
 ) {
 }

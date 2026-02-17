@@ -28,7 +28,7 @@ public class DefaultAuthService implements AuthService {
     @Override
     public JWTResponseDTO register(RegisterRequestDTO request) {
         if (authRepository.findByEmail(request.email()).isPresent()) {
-            throw new ConflictException("EMAIL", "Email already exists: " + request.email());
+            throw new ConflictException("EMAIL", "exception.auth.email.conflict", request.email());
         }
 
         var auth = authRepository.save(

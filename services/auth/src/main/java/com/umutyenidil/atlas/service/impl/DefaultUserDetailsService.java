@@ -20,9 +20,6 @@ public class DefaultUserDetailsService implements UserDetailsService {
     @NullMarked
     public UserDetails loadUserByUsername(String username) throws NotFoundException {
         return authRepository.findByEmail(username)
-                .orElseThrow(() -> new NotFoundException(
-                        "USER",
-                        "User not found with email: " + username
-                ));
+                .orElseThrow(() -> new NotFoundException("USER", "exception.auth.user.not.found", username));
     }
 }

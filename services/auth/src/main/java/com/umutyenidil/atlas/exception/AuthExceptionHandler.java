@@ -3,6 +3,8 @@ package com.umutyenidil.atlas.exception;
 import com.umutyenidil.atlas.dto.response.ErrorDetailDTO;
 import com.umutyenidil.atlas.dto.response.ErrorResponseDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,6 +17,45 @@ import java.util.List;
 @RestControllerAdvice
 @Slf4j
 public class AuthExceptionHandler {
+
+    private final MessageSource messageSource;
+
+    public AuthExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    private String getLocalizedMessage(String key, Object... args) {
+        return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
+    }
+
+    @ExceptionHandler(LocalizedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleLocalizedException(LocalizedException exception) {
+        log.error(exception.toString());
+
+        HttpStatus status = switch (exception) {
+            case NotFoundException _ -> HttpStatus.NOT_FOUND;
+            case ConflictException _ -> HttpStatus.CONFLICT;
+            case UnauthorizedException _ -> HttpStatus.UNAUTHORIZED;
+        };
+
+        ErrorDetailDTO.Type type = switch (exception) {
+            case NotFoundException _ -> ErrorDetailDTO.Type.NOT_FOUND;
+            case ConflictException _ -> ErrorDetailDTO.Type.CONFLICT;
+            case UnauthorizedException _ -> ErrorDetailDTO.Type.AUTH;
+        };
+
+        String message = getLocalizedMessage(exception.getMessageKey(), exception.getArgs());
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                ErrorDetailDTO.builder()
+                        .type(type)
+                        .subject(exception.getSubject())
+                        .message(message)
+                        .build()
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
@@ -39,71 +80,30 @@ public class AuthExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponseDTO> handleHttpMessageNotReadableException() {
 
+        String message = getLocalizedMessage("exception.client.malformed_json");
+
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
                 ErrorDetailDTO.builder()
                         .type(ErrorDetailDTO.Type.CLIENT)
                         .subject("MALFORMED_JSON")
-                        .message("The provided JSON input is invalid or malformed.")
+                        .message(message)
                         .build()
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponseDTO> handleUnauthorizedException(UnauthorizedException exception) {
-        log.error(exception.toString());
-
-        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
-                ErrorDetailDTO.builder()
-                        .type(ErrorDetailDTO.Type.AUTH)
-                        .subject(exception.getSubject())
-                        .message(exception.getMessage())
-                        .build()
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponseDTO> handleConflictException(ConflictException exception) {
-        log.error(exception.toString());
-
-        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
-                ErrorDetailDTO.builder()
-                        .type(ErrorDetailDTO.Type.CONFLICT)
-                        .subject(exception.getSubject())
-                        .message(exception.getMessage())
-                        .build()
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleNotFoundException(NotFoundException exception) {
-        log.error(exception.toString());
-
-        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
-                ErrorDetailDTO.builder()
-                        .type(ErrorDetailDTO.Type.NOT_FOUND)
-                        .subject(exception.getSubject())
-                        .message(exception.getMessage())
-                        .build()
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleException(Exception exception) {
         log.error(exception.toString());
+
+        String message = getLocalizedMessage("exception.server.internal_error");
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
                 ErrorDetailDTO.builder()
                         .type(ErrorDetailDTO.Type.SERVER)
                         .subject("SERVER")
-                        .message("An unexpected error occurred. Please contact support if the problem persists.")
+                        .message(message)
                         .build()
         );
 

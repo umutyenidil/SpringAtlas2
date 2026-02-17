@@ -55,10 +55,7 @@ public class JWTFilter extends OncePerRequestFilter {
             final String email;
 
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                throw new UnauthorizedException(
-                        "BEARER",
-                        "Authorization header must start with Bearer"
-                );
+                throw new UnauthorizedException("BEARER", "exception.auth.bearer.invalid");
             }
 
             // todo: add black listing logic.

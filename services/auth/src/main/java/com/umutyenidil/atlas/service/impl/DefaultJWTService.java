@@ -31,10 +31,6 @@ public class DefaultJWTService implements JWTService {
     @Value("${application.security.jwt.secret}")
     private String jwtSecret;
 
-    public String generateToken(Auth auth) {
-        return generateAccessToken(new HashMap<>(), auth);
-    }
-
     public String generateAccessToken(Map<String, Object> claims, Auth auth) {
         return buildToken(claims, auth, accessTokenExpiration);
     }

@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.Map;
 
 public interface JWTService {
-    String generateToken(Auth auth);
-
     String generateAccessToken(Map<String, Object> claims, Auth auth);
 
     String generateRefreshToken(Map<String, Object> claims, Auth auth);

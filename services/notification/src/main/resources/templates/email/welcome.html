@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:replace="~{email/layout/base :: layout(~{::main})}">
+
+    <main>
+        <h3>Aramıza Hoş Geldin! 🎉</h3>
+        <p>Merhaba <strong th:text="${email}">Kullanıcı</strong>,</p>
+
+        <p>Atlas projesine başarıyla kayıt oldun. Seninle harika işler başaracağımıza eminiz.</p>
+
+        <p>Uygulamayı keşfetmek için hemen giriş yapabilirsin.</p>
+
+        <a href="https://atlas.umutyenidil.com/login"
+           style="display: inline-block; padding: 10px 20px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px;">
+            Giriş Yap
+        </a>
+    </main>
+
+</div>
+
+</body>
+</html>

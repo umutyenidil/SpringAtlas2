@@ -22,6 +22,14 @@ services:
     networks:
       - atl_network
 
+  maildev:
+    container_name: atl_maildev
+    image: maildev/maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
 networks:
   atl_network:
     driver: bridge

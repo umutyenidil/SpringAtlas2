@@ -1,9 +1,11 @@
 package com.umutyenidil.atlas.service.impl;
 
+import com.umutyenidil.atlas.dto.event.UserRegisteredEvent;
 import com.umutyenidil.atlas.dto.request.RegisterRequestDTO;
 import com.umutyenidil.atlas.dto.response.JWTResponseDTO;
 import com.umutyenidil.atlas.entity.Auth;
 import com.umutyenidil.atlas.exception.ConflictException;
+import com.umutyenidil.atlas.messaging.publisher.UserEventPublisher;
 import com.umutyenidil.atlas.repository.AuthRepository;
 import com.umutyenidil.atlas.service.AuthService;
 import com.umutyenidil.atlas.service.JWTService;
@@ -18,11 +20,13 @@ public class DefaultAuthService implements AuthService {
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jWTService;
+    private final UserEventPublisher userEventPublisher;
 
-    public DefaultAuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder, JWTService jWTService) {
+    public DefaultAuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder, JWTService jWTService, UserEventPublisher userEventPublisher) {
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
         this.jWTService = jWTService;
+        this.userEventPublisher = userEventPublisher;
     }
 
     @Override
@@ -42,6 +46,10 @@ public class DefaultAuthService implements AuthService {
 
         var accessToken = jWTService.generateAccessToken(claims, auth);
         var refreshToken = jWTService.generateRefreshToken(claims, auth);
+
+        userEventPublisher.publishUserRegisteredEvent(UserRegisteredEvent.builder()
+                .email(auth.getEmail())
+                .build());
 
         return JWTResponseDTO.builder()
                 .accessToken(accessToken)

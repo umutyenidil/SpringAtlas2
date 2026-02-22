@@ -1,6 +1,6 @@
 package com.umutyenidil.atlas.service.impl;
 
-import com.umutyenidil.atlas.EmailTemplate;
+import com.umutyenidil.atlas.enumeration.EmailTemplate;
 import com.umutyenidil.atlas.service.NotificationService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

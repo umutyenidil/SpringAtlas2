@@ -30,6 +30,17 @@ services:
       - "1080:1080"
       - "1025:1025"
 
+  rabbitmq:
+    container_name: atl_rabbitmq
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: umut
+      RABBITMQ_DEFAULT_PASS: umut
+
 networks:
   atl_network:
     driver: bridge

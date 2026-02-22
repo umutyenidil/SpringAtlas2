@@ -1,4 +1,4 @@
-package com.umutyenidil.atlas;
+package com.umutyenidil.atlas.enumeration;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

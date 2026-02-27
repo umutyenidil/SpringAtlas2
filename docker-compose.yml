@@ -29,6 +29,8 @@ services:
     ports:
       - "1080:1080"
       - "1025:1025"
+    networks:
+      - atl_network
 
   rabbitmq:
     container_name: atl_rabbitmq
@@ -40,6 +42,43 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: umut
       RABBITMQ_DEFAULT_PASS: umut
+    networks:
+      - atl_network
+
+  localstack:
+    container_name: atl_localstack
+    image: localstack/localstack:latest
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=umut
+      - AWS_SECRET_ACCESS_KEY=umut
+    volumes:
+      - atl_localstack-data:/var/lib/localstack
+      - ./docker/localstack/init.sh:/etc/localstack/init/ready
+    networks:
+      - atl_network
+
+  imgproxy:
+    container_name: atl_imgproxy
+    image: darthsim/imgproxy:latest
+    ports:
+      - "8121:8080"
+    environment:
+      - IMGPROXY_S3_ENDPOINT_NO_VHOST=true
+      - IMGPROXY_USE_S3=true
+      - IMGPROXY_S3_ENDPOINT=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=umut
+      - AWS_SECRET_ACCESS_KEY=umut
+      - AWS_REGION=us-east-1
+    networks:
+      - atl_network
+    depends_on:
+      - localstack
 
 networks:
   atl_network:
@@ -47,3 +86,4 @@ networks:
 
 volumes:
   atl_postgres-data: { }
+  atl_localstack-data: { }

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package com.umutyenidil.atlas.grpc;
+
+message VariantValidationRequest {
+  string variant_id = 1;
+  int32 requested_quantity = 2;
+}
+
+message VariantValidationResponse {
+  bool is_available = 1;
+  double current_price = 2;
+  string product_name = 3;
+  int32 stock_quantity = 4;
+}
+
+service ProductGrpcService {
+  rpc ValidateVariant(VariantValidationRequest) returns (VariantValidationResponse);
+}

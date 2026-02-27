@@ -179,6 +179,10 @@ public class DefaultProductService implements ProductService {
     }
 
     private void validateVariantBarcodes(ProductCreateRequestDTO request) {
+        if (request.variants() == null || request.variants().isEmpty()) {
+            return;
+        }
+
         List<String> incomingBarcodes = request.variants().stream()
                 .map(VariantCreateRequestDTO::barcode)
                 .toList();

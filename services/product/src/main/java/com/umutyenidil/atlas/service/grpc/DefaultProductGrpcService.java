@@ -35,7 +35,7 @@ public class DefaultProductGrpcService extends ProductGrpcServiceGrpc.ProductGrp
             if (productVariantOpt.isPresent()) {
                 ProductVariant productVariant = productVariantOpt.get();
 
-                responseBuilder.setIsAvailable(productVariant.getStockQuantity() > request.getRequestedQuantity())
+                responseBuilder.setIsAvailable(productVariant.getStockQuantity() >= request.getRequestedQuantity())
                         .setCurrentPrice(productVariant.getPrice().doubleValue())
                         .setProductName(productVariant.getProduct().getName())
                         .setStockQuantity(productVariant.getStockQuantity());
